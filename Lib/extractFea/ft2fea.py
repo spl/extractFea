@@ -262,7 +262,7 @@ def formatValueRecord(valueRecord, valueFormat):
 def formatSingleAdjustment(lookup, lookupList, makeName=makeName):
     """ GPOS LookupType 1 """
 
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ])
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ]))
 
     for subtable in lookup.SubTable:
         assert subtable.Format in (1,2), 'Unknown subtable format {0} for lookup-type {1} {2}.' \
@@ -320,7 +320,7 @@ def formatLookupMarkToBase(lookup, lookupList, makeName=makeName):
                                         , subtable.LookupType
                                         , lookupTypesGPOS[subtable.LookupType][2])
     anchorClassPrefix = makeName('Anchor', unique=True)
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ]) \
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ])) \
             + formatMarkArray(subtable.MarkArray, subtable.MarkCoverage, anchorClassPrefix) \
             + formatBaseArray(subtable.BaseArray, subtable.BaseCoverage, anchorClassPrefix)
 
@@ -338,7 +338,7 @@ def formatLookupMarkToLigature(lookup, lookupList, makeName=makeName):
                                         , subtable.LookupType
                                         , lookupTypesGPOS[subtable.LookupType][2])
     anchorClassPrefix = makeName('Anchor', unique=True)
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ]) \
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ])) \
             + formatMarkArray(subtable.MarkArray, subtable.MarkCoverage, anchorClassPrefix) \
             + formatLigatureArray(subtable.LigatureArray, subtable.LigatureCoverage, anchorClassPrefix)
 
@@ -356,7 +356,7 @@ def formatLookupMarkToMark(lookup, lookupList, makeName=makeName):
                                         , subtable.LookupType
                                         , lookupTypesGPOS[subtable.LookupType][2])
     anchorClassPrefix = makeName('Anchor', unique=True)
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ]) \
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ])) \
             + formatMarkArray(subtable.Mark1Array, subtable.Mark1Coverage, anchorClassPrefix) \
             + formatMark2Array(subtable.Mark2Array, subtable.Mark2Coverage, anchorClassPrefix)
     return (True, lines)
@@ -367,7 +367,7 @@ def formatLookupSingleSubstitution(lookup, lookupList, makeName=makeName):
     # substitute <glyphclass> by <glyph>;        # format B
     # substitute <glyphclass> by <glyphclass>;   # format C
 
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ]) \
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ])) \
             + ['sub {0} by {1};'.format(*kv) for sub in lookup.SubTable
                                              for kv in sub.mapping.items()]
     return (True, lines)
@@ -376,7 +376,7 @@ def formatLookupMultipleSubstitution(lookup, lookupList, makeName=makeName):
     """ GSUB LookupType 2 """
     # substitute <glyph> by <glyph sequence>;
 
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ]) \
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ])) \
             + ['sub {0} by {1};'.format(k, ' '.join(v))
                                                 for sub in lookup.SubTable
                                                 for k, v in sub.mapping.items()]
@@ -386,7 +386,7 @@ def formatLookupAlternateSubstitution(lookup, lookupList, makeName=makeName):
     """ GSUB LookupType 3 """
     # substitute <glyph> from <glyphclass>;
 
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ]) \
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ])) \
             + ['sub {0} from [ {1} ];'.format(k, ' '.join(v))
                                                 for sub in lookup.SubTable
                                                 for k, v in sub.alternates.items()]
@@ -398,7 +398,7 @@ def formatLookupLigatureSubstitution(lookup, lookupList, makeName=makeName):
     # <glyph sequence> must contain two or more of <glyph|glyphclass>. For example:
     # substitute [one one.oldstyle] [slash fraction] [two two.oldstyle] by onehalf;
 
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ]) \
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ])) \
         + ['sub {0} {1} by {2};'.format(first, ' '.join(lig.Component), lig.LigGlyph)
                             for sub in lookup.SubTable
                                 for first, ligatures in sub.ligatures.items()
@@ -416,9 +416,9 @@ def formatLookupChainingContextualSubstitution(lookup, lookupList, makeName=make
     # comprises one or more glyphs or glyph classes
     # substitute [ a e i o u] f' lookup CNTXT_LIGS i' n' lookup CNTXT_SUB;
     def formatGlyphs(glyphs):
-        return ('[ {0} ]' if len(glyphs) > 1 else '{0}' ).format(' '.join(coverage.glyphs))
+        return ('[ {0} ]' if len(glyphs) > 1 else '{0}' ).format(' '.join(glyphs))
     dependencies = []
-    lines = filter(None, [ formatLookupflag(lookup, makeName=makeName) ])
+    lines = list(filter(None, [ formatLookupflag(lookup, makeName=makeName) ]))
     for sub in lookup.SubTable:
         if sub.Format in (1,2):
             raise NotImplementedError('Format {0} for lookup-type {1} {2}. is not implemented.' \

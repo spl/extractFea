@@ -33,6 +33,13 @@ from fontTools.misc.py23 import *
 from functools import wraps, partial
 from .ft2fea import makeName, printFont
 
+class StupidHashableTuple(tuple):
+    def __new__(cls, *args):
+        tuple.__new__(cls, args)
+
+    def __hash__(self):
+        return 1
+
 class ExportAggregator(object):
     """
     ExportAggregator provides a getStatus to use with the ft2fea print functions.
@@ -59,14 +66,14 @@ class ExportAggregator(object):
 
         noEntry = (None, None, False)
         if requiredState is not None:
-            status= self.registry.get((item, requiredState), noEntry)
+            status= self.registry.get(StupidHashableTuple(item, requiredState), noEntry)
         else:
             # If there are any, the "True" values trump the "False" values
             # When requiredState is None and we check for both key types
             # i.e. (item, True) and (item, False)
             status = list(noEntry)
             for req in (True, False):
-                key = (item, req)
+                key = StupidHashableTuple(item, req)
                 result, required, muted = self.registry.get(key, noEntry)
                 status[0] = status[0] or result
                 status[1] = status[1] or required
@@ -85,7 +92,7 @@ class ExportAggregator(object):
             # required flag than the cache key will use. That way "validateLookup"
             # can declare lookupflag dependencies in GDEF. GDEF validation
             # needs to run after all potentially dependent validations.
-            key = (item, kwargs.get('requiredKeyOverride', required))
+            key = StupidHashableTuple(item, kwargs.get('requiredKeyOverride', required))
             if 'requiredKeyOverride' in kwargs:
                 del kwargs['requiredKeyOverride']
             registered = self.registry.get(key, None)
