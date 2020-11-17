@@ -419,7 +419,7 @@ class Selector(object):
             if rule is not None:
                 result.append(rule)
         # shortest rule first, may speed up selecting a bit
-        result.sort(cmp=lambda x,y:len(x)-len(y))
+        result.sort(key=len)
         return result;
 
     def _ruleSelects(self, rule, item):
